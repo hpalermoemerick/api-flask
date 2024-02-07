@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="AdicionarPessoa">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.js" defer></script>
+    <title>Atualizar Dados</title>
+</head>
+
+<body class="bg-primary text-light">
+    <div class="container mt-3">
+        <form ng-controller="AdicionarPessoaCtrl">
+            <h1 class="text-center">Atualizar Dados</h1>
+            <div class="form-group">
+                <input type="hidden" id="id" value="{{pessoa[0][0]}}">
+                <label for="nome">Nome</label>
+                <input ng-model="nome" type="text" class="form-control" id="nome" placeholder="Nome" value="{{pessoa[0][1]}}">
+                <div ng-bind="nome"></div>
+            </div>
+            <div class="form-group">
+                <label for="idade">Idade</label>
+                <input ng-model="idade" type="number" class="form-control" id="idade" placeholder="Idade" value="{{pessoa[0][2]}}">
+                <div ng-bind="idade"></div>
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input ng-model="email" type="email" class="form-control" id="email" placeholder="Email" value="{{pessoa[0][3]}}">
+                <div ng-bind="email"></div>
+            </div>
+            <div class="text-center mt-3">
+                <button ng-click="addPerson()" class="btn btn-success">Atualizar</button>
+            </div>
+        </form>
+    </div>
+
+    <script defer>
+        document.addEventListener('DOMContentLoaded', function () {
+            let app = angular.module('AdicionarPessoa', []);
+            app.controller('AdicionarPessoaCtrl', function ($scope, $http) {
+                $scope.id = document.getElementById('id').value;
+                $scope.nome = document.getElementById('nome').value;
+                $scope.idade = parseInt(document.getElementById('idade').value);
+                $scope.email = document.getElementById('email').value;
+                $scope.addPerson = function () {
+                    $http({
+                        url: '/update/'+$scope.id,
+                        method: 'PUT',
+                        data: {
+                            nome: $scope.nome,
+                            idade: $scope.idade,
+                            email: $scope.email || $scope.nome + "@gmail.com"
+                        }
+                    }).then(response => {
+                        window.location.href = response.data.url;
+                    }).catch(error => {
+                        console.log("error");
+                        console.log(error);
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

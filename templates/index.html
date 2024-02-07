@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="Index">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.js" defer></script>
+    <title>Flask + MySQL</title>
+</head>
+
+<body class="bg-primary text-light" ng-controller="IndexCtrl">
+    <div class="container">
+        <h1 class="m-2 text-center">Lista de Pessoas</h1>
+        <table class="table table-secondary">
+            <tr>
+                <th>Nome</th>
+                <th>Idade</th>
+                <th>Email</th>
+                <th>Ações</th>
+            </tr>
+            {% for pessoa in listaPessoas %}
+            <tr>
+                <td>{{ pessoa[1] }}</td>
+                <td>{{ pessoa[2] }}</td>
+                <td>{{ pessoa[3] }}</td>
+                <td>
+                    <a href="/update/{{pessoa[0]}}" class="btn btn-warning">Atualizar</a>
+                    <button class="btn btn-danger"
+                        ng-click="ajustarDados('{{pessoa[0]}}', '{{pessoa[1]}}')">Deletar</button>
+
+                    <!-- <a href="/delete/{{pessoa[0]}}" class="btn btn-danger">Deletar</a> -->
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+        <a href="/addPerson" class="btn btn-success">Adicionar</a>
+    </div>
+
+    <div class="modal fade" id="delete" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content text-dark">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Deletar pessoa</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <p>Tem certeza que deseja deletar <span id="nomePessoa"></span>?</p>
+                    <button on type="button" class="btn btn-primary" data-bs-dismiss="modal">Cancelar</button>
+                    <button ng-click="deletar()" type="button" class="btn btn-danger"
+                        data-bs-dismiss="modal">Deletar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            let app = angular.module('Index', []);
+
+            app.run(function ($rootScope) {
+                $rootScope.idPessoa = null;
+            });
+
+            app.controller('IndexCtrl', function ($rootScope, $scope, $http) {
+                $scope.ajustarDados = function (id, nome) {
+                    $rootScope.idPessoa = id;
+
+                    document.querySelector('#nomePessoa').innerHTML = nome;
+                    let myModal = new bootstrap.Modal(document.getElementById('delete'), {
+                        keyboard: false
+                    });
+                    myModal.show();
+                }
+
+                $scope.deletar = function () {
+                    let urlDelete = '/delete/' + $rootScope.idPessoa;
+                    $http({
+                        url: urlDelete,
+                        method: 'DELETE',
+                    }).then(response => {
+                        window.location.href = response.data.url;
+                    }).catch(error => {
+                        console.log("error");
+                        console.log(error);
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
